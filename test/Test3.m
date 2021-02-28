@@ -1,6 +1,7 @@
 clear;
 close all;
 clc;
+addpath('../src');
 
 % number of used threads
 maxNumCompThreads('automatic'); 
@@ -8,10 +9,10 @@ maxNumCompThreads('automatic');
 eps_deg  = (1.e-3)^2; % eigenvalue degeneration tolerance in [MeV^2]
 N_lambda = 5;         % number of artificial lambda iteration
 
-% Hamiltonian with positive spectrum given below will be constructed
-n = 3000;
-PositiveSpectrum = 1 + linspace( 0 , 10 , n );       
-[ h , Delta ] = randHamiltonianMatix( PositiveSpectrum );
+% reading h and Delta matrices corresponding to Pu240
+h     = struct2array( load( '../data/Pu240/h.mat'     ) );
+Delta = struct2array( load( '../data/Pu240/Delta.mat' ) );
+n     = size(h,1);
 
 % lambdas are generated to simulate the root-finding in lambda iterations
 lambdas = 10 * randn( 1 , N_lambda ); % [MeV]
@@ -49,7 +50,7 @@ for i = 1 : N_lambda
     [Q,E] = eig( [h,Delta;Delta,-h] - lambdas(i)*[eye(n),zeros(n);zeros(n),-eye(n)] );
     [Q,E] = CHFBsolver.sortem( Q , E );
      
-    TargetValues2(i) = norm( Q( n+1:end , 1:n ) , 'fro' )^2;
+    TargetValues2(i) = norm( Q( n+1:n+n , 1:n ) , 'fro' )^2;
 end
 t2 = toc;
 
@@ -88,31 +89,3 @@ end
 
 
 
-function [ h , Delta ] = randHamiltonianMatix( PositiveSpectrum )
-    
-    n = length(PositiveSpectrum);
-    
-    [U,~] = qr( randn(n,n) );
-    [V,~] = qr( randn(n,n) );
-    
-    C = sqrt( rand(n,1) );
-    S = sqrt( ones(n,1) - C.^2 );
-    C = diag(C);
-    S = diag(S);
-
-    Q1 = U*C*V';
-    Q2 = U*S*V';
-    
-    H = [Q1,-Q2;Q2,Q1]' * [ diag(PositiveSpectrum) , zeros(n,n) ; ...
-                            zeros(n,n)             , -diag(PositiveSpectrum)  ] * ...
-        [Q1,-Q2;Q2,Q1];
-    
-    
-    h     = H( 1:n ,   1:n   );
-    Delta = H( 1:n , n+1:n+n );
-    
-    h     = 0.5 * ( h     + transp(h)     );
-    Delta = 0.5 * ( Delta + transp(Delta) );
-    
-    return;
-end

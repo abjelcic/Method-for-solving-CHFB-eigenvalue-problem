@@ -1,6 +1,7 @@
 clear;
 close all;
 clc;
+addpath('../src');
 
 % number of used threads
 maxNumCompThreads('automatic'); 
@@ -8,9 +9,9 @@ maxNumCompThreads('automatic');
 eps_deg  = (1.e-3)^2; % eigenvalue degeneration tolerance in [MeV^2]
 N_lambda = 5;         % number of artificial lambda iteration
 
-% Reading h and Delta matrices corresponding to O16
-h     = struct2array( load( './O16/h.mat'     ) );
-Delta = struct2array( load( './O16/Delta.mat' ) );
+% reading h and Delta matrices corresponding to O16
+h     = struct2array( load( '../data/O16/h.mat'     ) );
+Delta = struct2array( load( '../data/O16/Delta.mat' ) );
 n     = size(h,1);
 
 % lambdas are generated to simulate the root-finding in lambda iterations
@@ -49,7 +50,7 @@ for i = 1 : N_lambda
     [Q,E] = eig( [h,Delta;Delta,-h] - lambdas(i)*[eye(n),zeros(n);zeros(n),-eye(n)] );
     [Q,E] = CHFBsolver.sortem( Q , E );
      
-    TargetValues2(i) = norm( Q( n+1:end , 1:n ) , 'fro' )^2;
+    TargetValues2(i) = norm( Q( n+1:n+n , 1:n ) , 'fro' )^2;
 end
 t2 = toc;
 

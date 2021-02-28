@@ -1,7 +1,7 @@
 classdef CHFBsolver
     % CHFBsolver
     %
-    % Class how to use:
+    % How to use:
     % 1.) Instantiate a class with given matrices h,Delta and degeneration
     % tolerance eps_deg using obj = CHFBsolver( h , Delta , eps_deg ).
     %
@@ -11,14 +11,15 @@ classdef CHFBsolver
     properties( Access = private )
         h;
         Delta;
-        X; % X = (h+1j*Delta)*(h-1j*Delta)
+        X; % X = ( h + 1j*Delta ) * ( h - 1j*Delta )
         eps_deg;
     end
     
     methods( Access = public )
     
         function obj = CHFBsolver( h , Delta , eps_deg )
-            % CHFBsolver( h , Delta , eps_deg ) Construct an instance of this class.
+            % CHFBsolver( h , Delta , eps_deg )
+            % Construct an instance of this class.
             % h and Delta must be real symmetric nxn matrices.
             % eps_deg must be real positive number.
             
@@ -35,8 +36,8 @@ classdef CHFBsolver
             
             % step 0.)
             X = h + 1j*Delta;
-            X = X * X';
-            X = 0.5 * ( X + X' );
+            X = X * ctranspose(X);
+            X = 0.5 * ( X + ctranspose(X) );
             obj.X = X;
             
             assert( isreal(eps_deg) && size(eps_deg,1)==1 && size(eps_deg,2)==1 && eps_deg>0 , 'eps_deg must be positive real number' );
@@ -47,8 +48,9 @@ classdef CHFBsolver
         end
         
         function f = lambdaIteration( obj , lambda )
-            % f = obj.lambdaIteration( lambda ) returns f(lambda) for given
-            % lambda during the lambda iterations for instantianted object
+            % f = obj.lambdaIteration( lambda )
+            % Returns f(lambda) for given lambda during the lambda
+            % iterations for instantianted object
             % obj with parameters h, Delta and eps_deg.
             
             
@@ -86,23 +88,23 @@ classdef CHFBsolver
 
 
                 % step 4.)
-                e = + Q1(:,i:j)'*hQ1(:,i:j)     - Q2(:,i:j)'*hQ2(:,i:j) ...
-                    + Q1(:,i:j)'*DeltaQ2(:,i:j) + Q2(:,i:j)'*DeltaQ1(:,i:j);
+                e = + transp(Q1(:,i:j))*hQ1(:,i:j)     - transp(Q2(:,i:j))*hQ2(:,i:j)      ...
+                    + transp(Q1(:,i:j))*DeltaQ2(:,i:j) + transp(Q2(:,i:j))*DeltaQ1(:,i:j);
 
-                d = + Q1(:,i:j)'*DeltaQ1(:,i:j) - Q2(:,i:j)'*DeltaQ2(:,i:j) ...
-                    - Q1(:,i:j)'*hQ2(:,i:j)     - Q2(:,i:j)'*hQ1(:,i:j);
+                d = + transp(Q1(:,i:j))*DeltaQ1(:,i:j) - transp(Q2(:,i:j))*DeltaQ2(:,i:j)  ...
+                    - transp(Q1(:,i:j))*hQ2(:,i:j)     - transp(Q2(:,i:j))*hQ1(:,i:j);
 
-                e = 0.5 * ( e + e' );
-                d = 0.5 * ( d + d' );
+                e = 0.5 * ( e + transp(e) );
+                d = 0.5 * ( d + transp(d) );
 
 
                 % step 5.)
                 [qq,ee] = eig( [ e , d ; d , -e ] );
-                [qq,ee] = CHFBsolver.sortem( qq , ee );
+                [qq,~ ] = CHFBsolver.sortem( qq , ee );
 
-                nn = j-i+1;
-                C = qq(    1 : nn    , 1 : nn );
-                S = qq( nn+1 : nn+nn , 1 : nn );
+                nb = j-i+1;
+                C = qq(    1 : nb    , 1 : nb );
+                S = qq( nb+1 : nb+nb , 1 : nb );
                 
                 
                 % step 6.)
@@ -133,25 +135,4 @@ classdef CHFBsolver
     end
     
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
