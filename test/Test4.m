@@ -77,7 +77,7 @@ for i = 1 : N_lambda
     f1     = TargetValues1(i);
     f2     = TargetValues2(i);
     diff   = abs(f1-f2);
-    fprintf('lambda = %10.5f MeV, f_1 = %10.5f, f_2 = %10.5f., |f1-f2| = %10.5e\n' , lambda , f1 , f2 , diff );
+    fprintf('lambda = %10.5f MeV, f1 = %10.5f, f2 = %10.5f., |f1-f2| = %10.5e\n' , lambda , f1 , f2 , diff );
 end
 
 

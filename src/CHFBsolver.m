@@ -9,10 +9,10 @@ classdef CHFBsolver
     % returns the function value f(lambda) for given lambda.
     
     properties( Access = private )
+        eps_deg;
         h;
         Delta;
-        X; % X = ( h + 1j*Delta ) * ( h - 1j*Delta )
-        eps_deg;
+        X; % X = ( h + 1j*Delta )*( h - 1j*Delta ) = ( h^2 + Delta^2 ) + 1j*( Delta*h - h*Delta )
     end
     
     methods( Access = public )
@@ -30,18 +30,21 @@ classdef CHFBsolver
             assert( issymmetric(Delta) && isreal(Delta) , 'Delta must be real symmetric matrix' );
             
             assert( size(h,1) == size(Delta,1) , 'h and Delta must be matrices of the same order' );
+
+            assert( isreal(eps_deg) && size(eps_deg,1)==1 && size(eps_deg,2)==1 && eps_deg>0 , 'eps_deg must be positive real number' );
+
+            
+            obj.eps_deg = eps_deg;
             
             obj.h     = h;
             obj.Delta = Delta;
             
             % step 0.)
-            X = h + 1j*Delta;
-            X = X * ctranspose(X);
-            X = 0.5 * ( X + ctranspose(X) );
-            obj.X = X;
-            
-            assert( isreal(eps_deg) && size(eps_deg,1)==1 && size(eps_deg,2)==1 && eps_deg>0 , 'eps_deg must be positive real number' );
-            obj.eps_deg = eps_deg;
+            ReX   = h^2 + Delta^2;
+            ImX   = Delta*h;
+            ImX   = ImX - transp(ImX);
+            X     = complex( ReX , ImX );
+            obj.X = 0.5 * ( X + ctranspose(X) );
             
             
             return;
@@ -63,7 +66,7 @@ classdef CHFBsolver
             
             % step 2.)
             [Q,E] = eig( hdhd_lambda );
-            [Q,E] = obj.sortem( Q , E );
+            [Q,E] = CHFBsolver.sortem( Q , E );
             E  = diag(E);
             Q1 = real(Q);
             Q2 = imag(Q);
@@ -125,10 +128,10 @@ classdef CHFBsolver
 
     methods( Static )
     
-        function [ P2 , D2 ] = sortem( P , D )
-            D2      = diag( sort( diag(D) , 'descend' ) );
-            [~,ind] = sort( diag(D) , 'descend' );
-            P2 = P(:,ind);
+        function [ P , D ] = sortem( P , D )
+            [D,ind] = sort( diag(D) , 'descend' );
+            D = diag(D);
+            P = P(:,ind);
             return;
         end
         
