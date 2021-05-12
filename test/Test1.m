@@ -6,8 +6,8 @@ addpath('../src');
 % number of used threads
 maxNumCompThreads('automatic'); 
 
-eps_deg  = (1.e-3)^2; % eigenvalue degeneration tolerance in [MeV^2]
-N_lambda = 5;         % number of artificial lambda iteration
+eps_deg  = 1.e-3; % eigenvalue degeneration tolerance in [MeV]
+N_lambda = 5;     % number of artificial lambda iteration
 
 % Hamiltonian with positive spectrum given below will be constructed
 n = 3000;
@@ -47,7 +47,7 @@ TargetValues2 = zeros( 1 , N_lambda );
 
 for i = 1 : N_lambda
     
-    [Q,E] = eig( [h,Delta;Delta,-h] - lambdas(i)*[eye(n),zeros(n);zeros(n),-eye(n)] );
+    [Q,E] = eig( [h,Delta;Delta,-h] - [lambdas(i)*eye(n),zeros(n);zeros(n),-lambdas(i)*eye(n)] );
     [Q,E] = CHFBsolver.sortem( Q , E );
      
     TargetValues2(i) = norm( Q( n+1:n+n , 1:n ) , 'fro' )^2;

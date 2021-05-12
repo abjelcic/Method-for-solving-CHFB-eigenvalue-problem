@@ -21,7 +21,7 @@ classdef CHFBsolver
             % CHFBsolver( h , Delta , eps_deg )
             % Construct an instance of this class.
             % h and Delta must be real symmetric nxn matrices.
-            % eps_deg must be real positive number.
+            % eps_deg must be real positive number in MeV units.
             
             assert( size(h,1) == size(h,2)      , 'h must be square matrix'         );
             assert( issymmetric(h) && isreal(h) , 'h must be real symmetric matrix' );
@@ -29,7 +29,7 @@ classdef CHFBsolver
             assert( size(Delta,1) == size(Delta,2)      , 'Delta must be square matrix'         );
             assert( issymmetric(Delta) && isreal(Delta) , 'Delta must be real symmetric matrix' );
             
-            assert( size(h,1) == size(Delta,1) , 'h and Delta must be matrices of the same order' );
+            assert( length(h) == length(Delta) , 'h and Delta must be matrices of the same order' );
 
             assert( isreal(eps_deg) && size(eps_deg,1)==1 && size(eps_deg,2)==1 && eps_deg>0 , 'eps_deg must be positive real number' );
 
@@ -57,7 +57,7 @@ classdef CHFBsolver
             % obj with parameters h, Delta and eps_deg.
             
             
-            n = size(obj.h,1);
+            n = length(obj.h);
             
             h_lambda = obj.h - lambda*eye(n,n);
             
@@ -83,7 +83,7 @@ classdef CHFBsolver
                 
                 % step 3.)
                 j = i;
-                while( j<=n && abs(ev-E(j))<obj.eps_deg )
+                while( j<=n && CHFBsolver.isdegen( ev , E(j) , obj.eps_deg ) )
                     j = j + 1;
                 end
                 j = j - 1;
@@ -125,9 +125,21 @@ classdef CHFBsolver
         end
 
     end
-
-    methods( Static )
     
+    methods( Static , Access = private )
+        
+        function bool = isdegen( e1 , e2 , eps_deg )
+            bool = false;
+            if( abs( sqrt(e1) - sqrt(e2) ) < eps_deg )
+                bool = true;
+            end
+            return;
+        end
+        
+    end    
+    
+    methods( Static , Access = public )
+
         function [ P , D ] = sortem( P , D )
             [D,ind] = sort( diag(D) , 'descend' );
             D = diag(D);

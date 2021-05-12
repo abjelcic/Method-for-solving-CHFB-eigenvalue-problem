@@ -6,13 +6,13 @@ addpath('../src');
 % number of used threads
 maxNumCompThreads('automatic'); 
 
-eps_deg  = (1.e-3)^2; % eigenvalue degeneration tolerance in [MeV^2]
-N_lambda = 5;         % number of artificial lambda iteration
+eps_deg  = 1.e-3; % eigenvalue degeneration tolerance in [MeV^2]
+N_lambda = 5;     % number of artificial lambda iteration
 
 % generation of degenerated symmetric Hamiltonian matrix
 nd = 1000;
-Spectrum = [ -1 * ones(1,nd) , ...
-             -2 * ones(1,nd) , ...
+Spectrum = [ -2 * ones(1,nd) , ...
+             -1 * ones(1,nd) , ...
              +3 * ones(1,nd) ]; % [MeV]         
 n     = length( Spectrum );
 h     = randSymmetricMatrix( Spectrum );
@@ -47,7 +47,7 @@ TargetValues2 = zeros( 1 , N_lambda );
 
 for i = 1 : N_lambda
     
-    [Q,E] = eig( [h,Delta;Delta,-h] - lambdas(i)*[eye(n),zeros(n);zeros(n),-eye(n)] );
+    [Q,E] = eig( [h,Delta;Delta,-h] - [lambdas(i)*eye(n),zeros(n);zeros(n),-lambdas(i)*eye(n)] );
     [Q,E] = CHFBsolver.sortem( Q , E );
      
     TargetValues2(i) = norm( Q( n+1:n+n , 1:n ) , 'fro' )^2;
