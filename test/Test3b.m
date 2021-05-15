@@ -6,8 +6,8 @@ addpath('../src');
 % number of used threads
 maxNumCompThreads('automatic'); 
 
-eps_deg  = (1.e-3)^2; % eigenvalue degeneration tolerance in [MeV^2]
-N_lambda = 5;         % number of artificial lambda iteration
+eps_deg  = 1.e-3; % eigenvalue degeneration tolerance in [MeV]
+N_lambda = 5;     % number of artificial lambda iteration
 
 % reading h and Delta matrices corresponding to Pu240 from HFBTHO
 h     = struct2array( load( '../data/Pu240/HFBTHO/h.mat'     ) );
@@ -17,10 +17,10 @@ n     = length(h);
 % lambdas are generated to simulate the root-finding in lambda iterations
 lambdas = 10 * randn( 1 , N_lambda ); % [MeV]
 
-
-
-
-
+% radnom permutation of rows and colums of h and Delta
+P     = randperm(n);
+h     = h(P,P);
+Delta = Delta(P,P);
 
 
 

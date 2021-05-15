@@ -6,8 +6,8 @@ addpath('../src');
 % number of used threads
 maxNumCompThreads('automatic'); 
 
-eps_deg  = (1.e-3)^2; % eigenvalue degeneration tolerance in [MeV^2]
-N_lambda = 5;         % number of artificial lambda iteration
+eps_deg  = 1.e-3; % eigenvalue degeneration tolerance in [MeV]
+N_lambda = 5;     % number of artificial lambda iteration
 
 % reading h and Delta matrices corresponding to O16 from DIRHB
 h     = struct2array( load( '../data/O16/DIRHB/h.mat'     ) );

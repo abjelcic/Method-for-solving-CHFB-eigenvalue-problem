@@ -6,7 +6,7 @@ addpath('../src');
 % number of used threads
 maxNumCompThreads('automatic'); 
 
-eps_deg  = 1.e-3; % eigenvalue degeneration tolerance in [MeV^2]
+eps_deg  = 1.e-3; % eigenvalue degeneration tolerance in [MeV]
 N_lambda = 5;     % number of artificial lambda iteration
 
 % generation of degenerated symmetric Hamiltonian matrix
